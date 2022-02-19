@@ -7,7 +7,6 @@ import plotly.express as px
 import unidecode
 from PIL import Image
 import time
-#from dataprep.clean import clean_country
 
 todos_streamings = pd.DataFrame()
 tipos_graficos = ["Pyplot", "Seaborn"]
