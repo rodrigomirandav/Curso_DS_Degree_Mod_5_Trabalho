@@ -7,8 +7,8 @@ import plotly.express as px
 import unidecode
 from PIL import Image
 import time
+from dataprep.clean import clean_country
 
-# from dataprep.clean import clean_country
 todos_streamings = pd.DataFrame()
 tipos_graficos = ["Pyplot", "Seaborn"]
 
@@ -170,7 +170,36 @@ def analise_1():
 
 def analise_2():
     with st.container():
-        pass
+        global todos_streamings
+        st.empty()
+        st.header("2. Filmes por países")
+
+        create_filter(st)
+
+        filmes_paises = todos_streamings[["title", "country"]].copy()
+        filmes_paises = filmes_paises.country.str.split(",").explode().fillna("Outros").str.strip()
+        filmes_paises = filmes_paises.value_counts().reset_index()
+        filmes_paises.columns = ["País", "Quantidade de filmes"]
+        filmes_paises = filmes_paises[1:11]
+        filmes_paises = clean_country(filmes_paises, 'País', output_format='alpha-3')
+        filmes_paises['Pais_Text'] = filmes_paises['País'] + ' - ' + filmes_paises['Quantidade de filmes'].astype(str)
+        filmes_paises.iloc[:, 0:2]
+
+        st.subheader("Dataframe")
+        st.dataframe(filmes_paises)
+
+        st.subheader("Gráfico")
+
+        if st.session_state.tipo_grafico == "Pyplot":
+            fig = px.choropleth(filmes_paises,
+                                locations="País_clean",
+                                color="Pais_Text",
+                                hover_name="Pais_Text")
+
+            fig.update_layout(
+                legend_title="País - Quantidade de Filmes"
+            )
+            st.plotly_chart(fig)
 
 
 def analise_3():
