@@ -6,3 +6,4 @@ streamlit
 unidecode
 dataprep
 numpy
+Jinja2
