@@ -190,16 +190,15 @@ def analise_2():
 
         st.subheader("Gráfico")
 
-        if st.session_state.tipo_grafico == "Pyplot":
-            fig = px.choropleth(filmes_paises,
-                                locations="País_clean",
-                                color="Pais_Text",
-                                hover_name="Pais_Text")
+        fig = px.choropleth(filmes_paises,
+                            locations="País_clean",
+                            color="Pais_Text",
+                            hover_name="Pais_Text")
 
-            fig.update_layout(
-                legend_title="País - Quantidade de Filmes"
-            )
-            st.plotly_chart(fig)
+        fig.update_layout(
+            legend_title="País - Quantidade de Filmes"
+        )
+        st.plotly_chart(fig)
 
 
 def analise_3():
