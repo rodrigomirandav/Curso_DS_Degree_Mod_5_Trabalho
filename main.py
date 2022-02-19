@@ -7,7 +7,7 @@ import plotly.express as px
 import unidecode
 from PIL import Image
 import time
-from dataprep.clean import clean_country
+#from dataprep.clean import clean_country
 
 todos_streamings = pd.DataFrame()
 tipos_graficos = ["Pyplot", "Seaborn"]
@@ -181,7 +181,7 @@ def analise_2():
         filmes_paises = filmes_paises.value_counts().reset_index()
         filmes_paises.columns = ["País", "Quantidade de filmes"]
         filmes_paises = filmes_paises[1:11]
-        filmes_paises = clean_country(filmes_paises, 'País', output_format='alpha-3')
+        #filmes_paises = clean_country(filmes_paises, 'País', output_format='alpha-3')
         filmes_paises['Pais_Text'] = filmes_paises['País'] + ' - ' + filmes_paises['Quantidade de filmes'].astype(str)
         filmes_paises.iloc[:, 0:2]
 
