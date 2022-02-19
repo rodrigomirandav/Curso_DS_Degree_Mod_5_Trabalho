@@ -18,7 +18,7 @@ if 'modulo_sistema' not in st.session_state:
     st.session_state.modulo_sistema = 'principal'
 
 if 'quantidade_1' not in st.session_state:
-    st.session_state.quantidade_1 = 15
+    st.session_state.quantidade_1 = '15'
 
 
 def load_df_streamings():
