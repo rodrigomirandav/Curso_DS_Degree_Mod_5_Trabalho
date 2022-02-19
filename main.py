@@ -6,6 +6,7 @@ import seaborn as sns
 import plotly.express as px
 import unidecode
 from PIL import Image
+import time
 
 # from dataprep.clean import clean_country
 todos_streamings = pd.DataFrame()
@@ -18,7 +19,7 @@ if 'modulo_sistema' not in st.session_state:
     st.session_state.modulo_sistema = 'principal'
 
 if 'quantidade_1' not in st.session_state:
-    st.session_state.quantidade_1 = '15'
+    st.session_state.quantidade_1 = 10
 
 
 def load_df_streamings():
@@ -72,14 +73,34 @@ def create_sidebar():
                       args=('equipe',))
 
     st.sidebar.button("1. Qual genero mais apareceu no geral",
-                      key="id_genero",
+                      key="id_analise1",
                       on_click=change_module,
                       args=('analise_1',))
 
-    st.sidebar.button("Equipe", key="id_equipe2")
-    st.sidebar.button("Equipe", key="id_equipe3")
-    st.sidebar.button("Equipe", key="id_equipe4")
-    st.sidebar.button("Equipe", key="id_equipe5")
+    st.sidebar.button("2. Filmes por países",
+                      key="id_analise2",
+                      on_click=change_module,
+                      args=('analise_2',))
+
+    st.sidebar.button("3. Filmes por ano adicionados",
+                      key="id_analise3",
+                      on_click=change_module,
+                      args=('analise_3',))
+
+    st.sidebar.button("4. Gênero 2020/2021",
+                      key="id_analise4",
+                      on_click=change_module,
+                      args=('analise_4',))
+
+    st.sidebar.button("5. Média de duração dos filmes",
+                      key="id_analise5",
+                      on_click=change_module,
+                      args=('analise_5',))
+
+    st.sidebar.button("Encerramento",
+                      key="id_encerramento",
+                      on_click=change_module,
+                      args=('encerramento',))
 
 
 def principal():
@@ -122,7 +143,9 @@ def analise_1():
         generos = generos.value_counts().reset_index()
         generos.columns = ["Gênero", "Quantidade de filmes"]
         generos = generos[:15]
-        generos = generos.head(st.session_state.quantidade_1)
+
+        if st.session_state.quantidade_1 != None:
+            generos = generos.head(st.session_state.quantidade_1)
 
         st.subheader("Dataframe")
         st.dataframe(generos)
@@ -145,6 +168,41 @@ def analise_1():
             st.pyplot(fig)
 
 
+def analise_2():
+    with st.container():
+        pass
+
+
+def analise_3():
+    with st.container():
+        pass
+
+
+def analise_4():
+    with st.container():
+        pass
+
+
+def analise_5():
+    with st.container():
+        pass
+
+
+def encerramento():
+    with st.container():
+        st.empty()
+        st.header('')
+        st.text("")
+        image = Image.open('encerramento.png')
+        st.image(image, caption="Muito obrigado!")
+
+        st.balloons()
+        time.sleep(15)
+        st.balloons()
+        time.sleep(10)
+        st.balloons()
+
+
 def change_module(module='principal'):
     st.session_state.modulo_sistema = module
 
@@ -161,6 +219,16 @@ def main():
         equipe()
     elif st.session_state.modulo_sistema == 'analise_1':
         analise_1()
+    elif st.session_state.modulo_sistema == 'analise_2':
+        analise_2()
+    elif st.session_state.modulo_sistema == 'analise_3':
+        analise_3()
+    elif st.session_state.modulo_sistema == 'analise_4':
+        analise_4()
+    elif st.session_state.modulo_sistema == 'analise_5':
+        analise_5()
+    elif st.session_state.modulo_sistema == 'encerramento':
+        encerramento()
 
 
 if __name__ == "__main__":
