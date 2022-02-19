@@ -46,7 +46,7 @@ def equipe():
         st.empty()
         st.text("")
         st.header("Squad")
-        st.subheader("Electus")
+        st.subheader("⚡ Electus ⚡")
         image = Image.open('Equipe.png')
         st.image(image, caption="Equipe")
 
