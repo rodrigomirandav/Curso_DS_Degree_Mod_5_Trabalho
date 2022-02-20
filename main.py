@@ -10,10 +10,10 @@ import time
 
 todos_streamings = pd.DataFrame()
 df_paises = pd.DataFrame()
-tipos_graficos = ["Pyplot", "Matplotlib\Seaborn"]
+tipos_graficos = ["Plotly", "Matplotlib\Seaborn"]
 
 if 'tipo_grafico' not in st.session_state:
-    st.session_state.tipo_grafico = "Pyplot"
+    st.session_state.tipo_grafico = "Plotly"
 
 if 'modulo_sistema' not in st.session_state:
     st.session_state.modulo_sistema = 'principal'
@@ -201,7 +201,7 @@ def analise_1():
 
         st.subheader("Gráfico")
 
-        if st.session_state.tipo_grafico == "Pyplot":
+        if st.session_state.tipo_grafico == "Plotly":
             fig = px.bar(generos,
                          x="Quantidade de filmes",
                          y="Gênero",
@@ -309,7 +309,7 @@ def analise_3():
 
             for pos in range(len(streamings_anos)):
                 line = streamings_anos.iloc[pos, :]
-                plt.text(line.Ano + 0.1, line['Quantidade de filmes'] + 30, str(line['Quantidade de filmes']),
+                fig.text(line.Ano + 0.1, line['Quantidade de filmes'] + 30, str(line['Quantidade de filmes']),
                          fontsize=14)
 
             st.pyplot(fig)
@@ -358,7 +358,7 @@ def analise_4():
 
         st.subheader("Gráfico")
 
-        if st.session_state.tipo_grafico == "Pyplot":
+        if st.session_state.tipo_grafico == "Plotly":
             fig = fig = px.bar(genero_por_ano,
                                x="Gênero",
                                y="Quantidade de filmes",
@@ -430,7 +430,7 @@ def analise_5():
 
         st.subheader("Gráfico")
 
-        if st.session_state.tipo_grafico == "Pyplot":
+        if st.session_state.tipo_grafico == "Plotly":
             fig = px.histogram(duracao_media_filmes,
                                x="Duração",
                                y="Quantidade de filmes",
