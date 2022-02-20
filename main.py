@@ -21,6 +21,18 @@ if 'modulo_sistema' not in st.session_state:
 if 'quantidade_1' not in st.session_state:
     st.session_state.quantidade_1 = 10
 
+if 'paises' not in st.session_state:
+    st.session_state.paises = []
+
+if 'paises_selecionados' not in st.session_state:
+    st.session_state.paises_selecionados = []
+
+if 'quantidade_paises' not in st.session_state:
+    st.session_state.quantidade_paises = 10
+
+if 'quantidade_paises_max' not in st.session_state:
+    st.session_state.quantidade_paises_max = 0
+
 
 def load_df_streamings():
     amazon = pd.read_csv('https://letscodeeleicao.s3.us-west-1.amazonaws.com/amazon_prime_titles.csv')
@@ -59,7 +71,27 @@ def create_filter(container):
         container.slider('Quantidade de generos',
                          min_value=5,
                          max_value=15,
+                         value=st.session_state.quantidade_1,
                          key='quantidade_1')
+    elif st.session_state.modulo_sistema == 'analise_2':
+        container.subheader("Filtros")
+
+        container.multiselect("Selecionar países",
+                              options=st.session_state.paises,
+                              key="paises_selecionados")
+
+        container.slider('Quantidade de países',
+                         min_value=1,
+                         max_value=st.session_state.quantidade_paises_max,
+                         disabled=(len(st.session_state.paises_selecionados) > 0),
+                         value=st.session_state.quantidade_paises,
+                         key='quantidade_paises')
+    elif st.session_state.modulo_sistema == 'analise_3':
+        pass
+    elif st.session_state.modulo_sistema == 'analise_4':
+        pass
+    elif st.session_state.modulo_sistema == 'analise_5':
+        pass
 
 
 def create_sidebar():
@@ -139,8 +171,6 @@ def analise_1():
         st.empty()
         st.header("1. Qual genero mais apareceu no geral")
 
-        create_filter(st)
-
         generos = todos_streamings[["title", "listed_in"]].copy()
         generos = generos.listed_in.str.split(",").explode().fillna("Outros").str.strip()
         generos = generos.value_counts().reset_index()
@@ -149,6 +179,10 @@ def analise_1():
 
         if st.session_state.quantidade_1 != None:
             generos = generos.head(st.session_state.quantidade_1)
+
+        create_filter(st)
+
+        generos.index = list(range(1, len(generos) + 1))
 
         st.subheader("Dataframe")
         st.dataframe(generos)
@@ -178,8 +212,6 @@ def analise_2():
         st.empty()
         st.header("2. Filmes por países")
 
-        create_filter(st)
-
         filmes_paises = todos_streamings[["title", "country"]].copy()
         filmes_paises = filmes_paises.country.str.split(",").explode().fillna("Outros").str.strip()
         filmes_paises = filmes_paises.value_counts().reset_index()
@@ -187,6 +219,19 @@ def analise_2():
         filmes_paises = filmes_paises.merge(df_paises, how='left', left_on='País', right_on='Pais')
         filmes_paises['Pais_Text'] = filmes_paises['País'] + ' - ' + filmes_paises['Quantidade de filmes'].astype(str)
         filmes_paises.dropna(inplace=True)
+
+        st.session_state.quantidade_paises_max = len(filmes_paises)
+        st.session_state.paises = filmes_paises['País'].sort_values()
+
+        if (len(st.session_state.paises_selecionados) > 0):
+            filmes_paises = filmes_paises[filmes_paises['País'].isin(st.session_state.paises_selecionados)]
+            st.session_state.quantidade_paises = len(filmes_paises)
+
+        filmes_paises = filmes_paises.head(st.session_state.quantidade_paises)
+
+        create_filter(st)
+
+        filmes_paises.index = list(range(1, len(filmes_paises) + 1))
 
         st.subheader("Dataframe")
         st.dataframe(filmes_paises.iloc[:, 0:2])
@@ -279,6 +324,7 @@ def analise_4():
         # if st.session_state.quantidade_1 != None:
         #    generos = generos.head(st.session_state.quantidade_1)
 
+        genero_por_ano.index = list(range(1, len(genero_por_ano) + 1))
         st.subheader("Dataframe")
         st.dataframe(genero_por_ano)
 
@@ -320,6 +366,7 @@ def analise_5():
         # if st.session_state.quantidade_1 != None:
         #    generos = generos.head(st.session_state.quantidade_1)
 
+        duracao_media_filmes.index = list(range(1, len(duracao_media_filmes) + 1))
         st.subheader("Dataframe")
         st.dataframe(duracao_media_filmes)
 
@@ -348,9 +395,9 @@ def encerramento():
         st.image(image, caption="Muito obrigado!")
 
         st.balloons()
-        time.sleep(15)
-        st.balloons()
         time.sleep(10)
+        st.balloons()
+        time.sleep(5)
         st.balloons()
 
 
