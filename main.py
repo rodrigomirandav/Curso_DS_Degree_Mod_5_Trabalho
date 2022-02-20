@@ -297,11 +297,12 @@ def analise_3():
             st.plotly_chart(fig)
         elif st.session_state.tipo_grafico == "Matplotlib\Seaborn":
             plt.style.use("seaborn-dark-palette")
-            fig = plt.plot("Ano",
-                           "Quantidade de filmes",
-                           data=streamings_anos,
-                           marker='o'
-                           )
+            fig, ax = plt.subplots(figsize=(16, 8))
+            plt.plot("Ano",
+                     "Quantidade de filmes",
+                     data=streamings_anos,
+                     marker='o'
+                     )
             plt.grid(axis='y', linestyle='-', color='grey', zorder=0)
             plt.title('Filmes adicionados por ano', fontsize=22)
             plt.xlabel('Ano', fontsize=15)
@@ -441,10 +442,11 @@ def analise_5():
             st.plotly_chart(fig)
         elif st.session_state.tipo_grafico == "Matplotlib\Seaborn":
             plt.set_loglevel('WARNING')
-            fig = plt.bar("Duração",
-                          "Quantidade de filmes",
-                          data=duracao_media_filmes
-                          )
+            fig, ax = plt.subplots(figsize=(16, 8))
+            plt.bar("Duração",
+                    "Quantidade de filmes",
+                    data=duracao_media_filmes
+                    )
 
             plt.grid(axis='y', linestyle='-', color='grey', zorder=0)
             plt.title('Duração média por filme', fontsize=22)
