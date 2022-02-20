@@ -338,9 +338,12 @@ def analise_5():
 
 def encerramento():
     with st.container():
-        st.empty()
-        st.header('')
-        st.text("")
+        for i in range(5):
+            st.empty()
+            st.header('')
+            st.text("")
+            time.sleep(1)
+
         image = Image.open('encerramento.png')
         st.image(image, caption="Muito obrigado!")
 
