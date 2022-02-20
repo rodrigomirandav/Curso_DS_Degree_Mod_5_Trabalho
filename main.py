@@ -431,8 +431,7 @@ def analise_5():
             plt.set_loglevel('WARNING')
             fig = plt.bar("Duração",
                           "Quantidade de filmes",
-                          data=duracao_media_filmes,
-                          colorscale="Viridis"
+                          data=duracao_media_filmes
                           )
 
             plt.grid(axis='y', linestyle='-', color='grey', zorder=0)
