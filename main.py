@@ -9,6 +9,7 @@ from PIL import Image
 import time
 
 todos_streamings = pd.DataFrame()
+df_paises = pd.DataFrame()
 tipos_graficos = ["Pyplot", "Seaborn"]
 
 if 'tipo_grafico' not in st.session_state:
@@ -25,6 +26,9 @@ def load_df_streamings():
     amazon = pd.read_csv('https://letscodeeleicao.s3.us-west-1.amazonaws.com/amazon_prime_titles.csv')
     netflix = pd.read_csv('https://letscodeeleicao.s3.us-west-1.amazonaws.com/netflix_titles.csv')
     disney = pd.read_csv('https://letscodeeleicao.s3.us-west-1.amazonaws.com/disney_plus_titles.csv')
+
+    global df_paises
+    df_paises = pd.read_csv('https://letscodeeleicao.s3.us-west-1.amazonaws.com/paises.csv', sep=";")
 
     amazon.drop(['show_id'], axis=1, inplace=True)
     netflix.drop(['show_id'], axis=1, inplace=True)
@@ -170,6 +174,7 @@ def analise_1():
 def analise_2():
     with st.container():
         global todos_streamings
+        global df_paises
         st.empty()
         st.header("2. Filmes por países")
 
@@ -179,18 +184,17 @@ def analise_2():
         filmes_paises = filmes_paises.country.str.split(",").explode().fillna("Outros").str.strip()
         filmes_paises = filmes_paises.value_counts().reset_index()
         filmes_paises.columns = ["País", "Quantidade de filmes"]
-        filmes_paises = filmes_paises[1:11]
-        #filmes_paises = clean_country(filmes_paises, 'País', output_format='alpha-3')
+        filmes_paises = filmes_paises.merge(df_paises, how='left', left_on='País', right_on='Pais')
         filmes_paises['Pais_Text'] = filmes_paises['País'] + ' - ' + filmes_paises['Quantidade de filmes'].astype(str)
-        filmes_paises.iloc[:, 0:2]
+        filmes_paises.dropna(inplace=True)
 
         st.subheader("Dataframe")
-        st.dataframe(filmes_paises)
+        st.dataframe(filmes_paises.iloc[:, 0:2])
 
         st.subheader("Gráfico")
 
         fig = px.choropleth(filmes_paises,
-                            locations="País_clean",
+                            locations="Pais_clean",
                             color="Pais_Text",
                             hover_name="Pais_Text")
 
@@ -202,17 +206,134 @@ def analise_2():
 
 def analise_3():
     with st.container():
-        pass
+        global todos_streamings
+        st.empty()
+        st.header("3. Filmes por ano adicionados")
+
+        create_filter(st)
+
+        streamings_anos = todos_streamings[["title", "date_added"]].copy()
+        streamings_anos = streamings_anos.date_added.str.split(expand=True)[2].fillna("Sem ano").value_counts()
+        streamings_anos = streamings_anos.reset_index()
+        streamings_anos.columns = ["Ano", "Quantidade de filmes"]
+        streamings_anos = streamings_anos[streamings_anos.Ano != 'Sem ano']
+
+        # if st.session_state.quantidade_1 != None:
+        #    generos = generos.head(st.session_state.quantidade_1)
+
+        st.subheader("Dataframe")
+        st.dataframe(streamings_anos)
+
+        st.subheader("Gráfico")
+
+        # if st.session_state.tipo_grafico == "Pyplot":
+        #     fig = px.bar(generos,
+        #                  x="Quantidade de filmes",
+        #                  y="Gênero",
+        #                  orientation='h',
+        #                  title='Quantidade de filmes por gênero')
+        #     fig.update_yaxes(autorange="reversed")
+        #     st.plotly_chart(fig)
+        # elif st.session_state.tipo_grafico == "Seaborn":
+        #     fig, ax = plt.subplots()
+        #     ax = sns.barplot(data=generos, x='Gênero', y='Quantidade de filmes', palette="flare")
+        #     ax.set_xticklabels(ax.get_xticklabels(), rotation=60)
+        #
+        #     st.pyplot(fig)
 
 
 def analise_4():
     with st.container():
-        pass
+        global todos_streamings
+        st.empty()
+        st.header("4. Gênero 2020/2021")
+
+        create_filter(st)
+
+        genero_por_ano = todos_streamings[["release_year", "listed_in"]].copy()
+        genero_por_ano.set_index('release_year', inplace=True)
+        genero_por_ano = genero_por_ano.listed_in.str.split(",").explode().str.strip()
+        genero_por_ano = genero_por_ano.reset_index()
+        genero_por_ano = genero_por_ano[genero_por_ano["release_year"] >= 2020]
+        genero_por_ano['Quantidade de filmes'] = 1
+
+        genero_por_ano_2020 = genero_por_ano[genero_por_ano['release_year'] == 2020]
+        genero_por_ano_2020 = genero_por_ano_2020.reset_index()
+        genero_por_ano_2020['release_year'] = 'Ano 2020'
+        genero_por_ano_2020 = genero_por_ano_2020.groupby(['release_year', 'listed_in'])['Quantidade de filmes'].sum()
+        genero_por_ano_2020 = genero_por_ano_2020.to_frame().head(10).sort_values('Quantidade de filmes',
+                                                                                  ascending=False)
+
+        genero_por_ano_2021 = genero_por_ano[genero_por_ano['release_year'] == 2021]
+        genero_por_ano_2021 = genero_por_ano_2021.reset_index()
+        genero_por_ano_2021['release_year'] = 'Ano 2021'
+        genero_por_ano_2021 = genero_por_ano_2021.groupby(['release_year', 'listed_in'])['Quantidade de filmes'].sum()
+        genero_por_ano_2021 = genero_por_ano_2021.to_frame().head(10).sort_values('Quantidade de filmes',
+                                                                                  ascending=False)
+
+        genero_por_ano = pd.concat([genero_por_ano_2020, genero_por_ano_2021])
+        genero_por_ano = genero_por_ano.reset_index()
+        genero_por_ano.columns = ['Ano', 'Gênero', 'Quantidade de filmes']
+        genero_por_ano.set_index(['Ano', 'Gênero'])
+
+        # if st.session_state.quantidade_1 != None:
+        #    generos = generos.head(st.session_state.quantidade_1)
+
+        st.subheader("Dataframe")
+        st.dataframe(genero_por_ano)
+
+        st.subheader("Gráfico")
+
+        if st.session_state.tipo_grafico == "Pyplot":
+            fig = fig = px.bar(genero_por_ano,
+                               x="Gênero",
+                               y="Quantidade de filmes",
+                               color="Ano",
+                               barmode='group',
+                               title="Gêneros 2020/2021")
+            st.plotly_chart(fig)
+        elif st.session_state.tipo_grafico == "Seaborn":
+            pass
 
 
 def analise_5():
     with st.container():
-        pass
+        global todos_streamings
+        st.empty()
+        st.header("6. Média de duração dos filmes")
+
+        create_filter(st)
+
+        duracao_media_filmes = todos_streamings.query('type=="Movie"')[["type", "duration"]].copy()
+        duracao_media_filmes.duration.replace(r'[a-z]+', '', regex=True, inplace=True)
+        duracao_media_filmes.duration.dropna().astype(int).max()
+        classes = [50, 70, 90, 110, 130, 150, duracao_media_filmes.duration.dropna().astype(int).max()]
+        labels = ['50', '70', '90', '110', '130', '150']
+        duracao_media_filmes = duracao_media_filmes.dropna()
+        duracao_media_filmes.duration = duracao_media_filmes.duration.astype(int)
+        duracao_media_filmes['duracao'] = pd.cut(x=duracao_media_filmes.duration, bins=classes, labels=labels)
+        duracao_media_filmes['qtd'] = 1
+        duracao_media_filmes = duracao_media_filmes.groupby(['duracao'])['qtd'].sum()
+        duracao_media_filmes = duracao_media_filmes.reset_index()
+        duracao_media_filmes.columns = ['Duração', 'Quantidade de filmes']
+
+        # if st.session_state.quantidade_1 != None:
+        #    generos = generos.head(st.session_state.quantidade_1)
+
+        st.subheader("Dataframe")
+        st.dataframe(duracao_media_filmes)
+
+        st.subheader("Gráfico")
+
+        if st.session_state.tipo_grafico == "Pyplot":
+            fig = px.histogram(duracao_media_filmes,
+                               x="Duração",
+                               y="Quantidade de filmes",
+                               title="Duração dos filmes")
+            fig.update_yaxes(title="Quantidade de filmes")
+            st.plotly_chart(fig)
+        elif st.session_state.tipo_grafico == "Seaborn":
+            pass
 
 
 def encerramento():
