@@ -309,7 +309,7 @@ def analise_3():
 
             for pos in range(len(streamings_anos)):
                 line = streamings_anos.iloc[pos, :]
-                fig.text(line.Ano + 0.1, line['Quantidade de filmes'] + 30, str(line['Quantidade de filmes']),
+                plt.text(line.Ano + 0.1, line['Quantidade de filmes'] + 30, str(line['Quantidade de filmes']),
                          fontsize=14)
 
             st.pyplot(fig)
