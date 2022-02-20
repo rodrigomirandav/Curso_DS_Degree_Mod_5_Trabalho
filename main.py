@@ -10,7 +10,7 @@ import time
 
 todos_streamings = pd.DataFrame()
 df_paises = pd.DataFrame()
-tipos_graficos = ["Pyplot", "Seaborn"]
+tipos_graficos = ["Pyplot", "Matplotlib\Seaborn"]
 
 if 'tipo_grafico' not in st.session_state:
     st.session_state.tipo_grafico = "Pyplot"
@@ -117,7 +117,7 @@ def create_sidebar():
                       on_click=change_module,
                       args=('analise_2',))
 
-    st.sidebar.button("3. Filmes por ano adicionados",
+    st.sidebar.button("3. Filmes adicionados por ano",
                       key="id_analise3",
                       on_click=change_module,
                       args=('analise_3',))
@@ -194,10 +194,12 @@ def analise_1():
                          x="Quantidade de filmes",
                          y="Gênero",
                          orientation='h',
-                         title='Quantidade de filmes por gênero')
+                         title='Quantidade de filmes por gênero',
+                         color="Quantidade de filmes",
+                         color_continuous_scale="Blugrn")
             fig.update_yaxes(autorange="reversed")
             st.plotly_chart(fig)
-        elif st.session_state.tipo_grafico == "Seaborn":
+        elif st.session_state.tipo_grafico == "Matplotlib\Seaborn":
             fig, ax = plt.subplots()
             ax = sns.barplot(data=generos, x='Gênero', y='Quantidade de filmes', palette="flare")
             ax.set_xticklabels(ax.get_xticklabels(), rotation=60)
@@ -253,7 +255,7 @@ def analise_3():
     with st.container():
         global todos_streamings
         st.empty()
-        st.header("3. Filmes por ano adicionados")
+        st.header("3. Filmes adicionados por ano")
 
         create_filter(st)
 
@@ -262,6 +264,8 @@ def analise_3():
         streamings_anos = streamings_anos.reset_index()
         streamings_anos.columns = ["Ano", "Quantidade de filmes"]
         streamings_anos = streamings_anos[streamings_anos.Ano != 'Sem ano']
+        streamings_anos = streamings_anos.sort_values(by="Ano")
+        streamings_anos = streamings_anos.astype('int64')
 
         # if st.session_state.quantidade_1 != None:
         #    generos = generos.head(st.session_state.quantidade_1)
@@ -271,20 +275,32 @@ def analise_3():
 
         st.subheader("Gráfico")
 
-        # if st.session_state.tipo_grafico == "Pyplot":
-        #     fig = px.bar(generos,
-        #                  x="Quantidade de filmes",
-        #                  y="Gênero",
-        #                  orientation='h',
-        #                  title='Quantidade de filmes por gênero')
-        #     fig.update_yaxes(autorange="reversed")
-        #     st.plotly_chart(fig)
-        # elif st.session_state.tipo_grafico == "Seaborn":
-        #     fig, ax = plt.subplots()
-        #     ax = sns.barplot(data=generos, x='Gênero', y='Quantidade de filmes', palette="flare")
-        #     ax.set_xticklabels(ax.get_xticklabels(), rotation=60)
-        #
-        #     st.pyplot(fig)
+        if st.session_state.tipo_grafico == "Pyplot":
+            fig = px.line(streamings_anos,
+                          x="Ano",
+                          y="Quantidade de filmes",
+                          text="Quantidade de filmes",
+                          title="Filmes adicionados por ano")
+            fig.update_traces(textposition="bottom right")
+            st.plotly_chart(fig)
+        elif st.session_state.tipo_grafico == "Matplotlib\Seaborn":
+            plt.style.use("seaborn-dark-palette")
+            fig = plt.plot("Ano",
+                           "Quantidade de filmes",
+                           data=streamings_anos,
+                           marker='o'
+                           )
+            plt.grid(axis='y', linestyle='-', color='grey', zorder=0)
+            plt.title('Filmes adicionados por ano', fontsize=22)
+            plt.xlabel('Ano', fontsize=15)
+            plt.ylabel('Quantidade de filmes', fontsize=15)
+
+            for pos in range(len(streamings_anos)):
+                line = streamings_anos.iloc[pos, :]
+                plt.text(line.Ano + 0.1, line['Quantidade de filmes'] + 30, str(line['Quantidade de filmes']),
+                         fontsize=14)
+
+            st.pyplot(fig)
 
 
 def analise_4():
@@ -338,8 +354,38 @@ def analise_4():
                                barmode='group',
                                title="Gêneros 2020/2021")
             st.plotly_chart(fig)
-        elif st.session_state.tipo_grafico == "Seaborn":
-            pass
+        elif st.session_state.tipo_grafico == "Matplotlib\Seaborn":
+            plt.style.use("seaborn-dark-palette")
+            fig, ax = plt.subplots(figsize=(16, 8))
+
+            labels = genero_por_ano['Gênero'].unique()
+
+            x = np.arange(len(labels))  # the label locations
+            width = 0.35  # the width of the bars
+
+            fig2020 = ax.bar(x - width / 2,
+                             "Quantidade de filmes",
+                             width=0.35,
+                             data=genero_por_ano[genero_por_ano.Ano == "Ano 2020"],
+                             color="royalblue",
+                             label="Ano 2020"
+                             )
+            fig2021 = ax.bar(x + width / 2,
+                             "Quantidade de filmes",
+                             width=0.35,
+                             data=genero_por_ano[genero_por_ano.Ano == "Ano 2021"],
+                             color="red",
+                             label="Ano 2021"
+                             )
+            plt.grid(axis='y', linestyle='-', color='grey', zorder=0)
+            ax.set_title('Gêneros por ano', fontsize=22)
+            ax.set_xlabel('Gênero', fontsize=15)
+            ax.set_ylabel('Quantidade de filmes', fontsize=15)
+            ax.set_xticklabels(labels)
+            plt.xticks(x)
+            plt.legend()
+            fig.tight_layout()
+            st.pyplot(fig)
 
 
 def analise_5():
@@ -376,11 +422,24 @@ def analise_5():
             fig = px.histogram(duracao_media_filmes,
                                x="Duração",
                                y="Quantidade de filmes",
-                               title="Duração dos filmes")
+                               title="Duração dos filmes",
+                               color="Quantidade de filmes",
+                               color_continuous_scale="Sunset")
             fig.update_yaxes(title="Quantidade de filmes")
             st.plotly_chart(fig)
-        elif st.session_state.tipo_grafico == "Seaborn":
-            pass
+        elif st.session_state.tipo_grafico == "Matplotlib\Seaborn":
+            plt.set_loglevel('WARNING')
+            fig = plt.bar("Duração",
+                          "Quantidade de filmes",
+                          data=duracao_media_filmes,
+                          colorscale="Viridis"
+                          )
+
+            plt.grid(axis='y', linestyle='-', color='grey', zorder=0)
+            plt.title('Duração média por filme', fontsize=22)
+            plt.xlabel('Duração', fontsize=15)
+            plt.ylabel('Quantidade de filmes', fontsize=15)
+            st.pyplot(fig)
 
 
 def encerramento():
