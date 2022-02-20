@@ -287,7 +287,7 @@ def analise_3():
 
         st.subheader("Gráfico")
 
-        if st.session_state.tipo_grafico == "Pyplot":
+        if st.session_state.tipo_grafico == "Plotly":
             fig = px.line(streamings_anos,
                           x="Ano",
                           y="Quantidade de filmes",
