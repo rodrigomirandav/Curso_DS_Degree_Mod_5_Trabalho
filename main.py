@@ -436,8 +436,7 @@ def analise_5():
                                x="Duração",
                                y="Quantidade de filmes",
                                title="Duração dos filmes",
-                               color="Quantidade de filmes",
-                               color_continuous_scale="Sunset")
+                               color="Quantidade de filmes")
             fig.update_yaxes(title="Quantidade de filmes")
             st.plotly_chart(fig)
         elif st.session_state.tipo_grafico == "Matplotlib\Seaborn":
