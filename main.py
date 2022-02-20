@@ -87,11 +87,23 @@ def create_filter(container):
                          value=st.session_state.quantidade_paises,
                          key='quantidade_paises')
     elif st.session_state.modulo_sistema == 'analise_3':
-        pass
+        container.subheader("Filtros")
+
+        container.selectbox('Tipos de gráficos',
+                            options=tipos_graficos,
+                            key='tipo_grafico')
     elif st.session_state.modulo_sistema == 'analise_4':
-        pass
+        container.subheader("Filtros")
+
+        container.selectbox('Tipos de gráficos',
+                            options=tipos_graficos,
+                            key='tipo_grafico')
     elif st.session_state.modulo_sistema == 'analise_5':
-        pass
+        container.subheader("Filtros")
+
+        container.selectbox('Tipos de gráficos',
+                            options=tipos_graficos,
+                            key='tipo_grafico')
 
 
 def create_sidebar():
