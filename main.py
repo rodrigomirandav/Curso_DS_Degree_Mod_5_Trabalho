@@ -338,7 +338,7 @@ def analise_5():
 
 def encerramento():
     with st.container():
-        for i in range(5):
+        for i in range(2):
             st.empty()
             st.header('')
             st.text("")
